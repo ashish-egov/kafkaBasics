@@ -105,3 +105,41 @@ In this example, we use the  Jackson JSON library  to deserialize the record's p
 Once the consumer has deserialized the record's payload, it can process the data in any way it chooses. For example, it could write the data to a database, perform some analysis on the data, or send the data to another system for further processing.
 
 In summary, consumers read records from Kafka topics and receive key-value pairs that contain payloads in various serialization formats. Before processing the payload, the consumer must first deserialize it into a usable form. Kafka supports multiple serialization formats, and the choice of serialization format depends on the use case and the data being stored in Kafka.
+
+# Consumer Groups and Consumer Offsets
+
+In  Kafka, a  **consumer group**  is a set of consumers that collectively consume records from one or more Kafka topics. Consumer groups allow for  parallel processing  of records and provide  fault tolerance.
+
+Each consumer in a consumer group reads records independently from the other consumers in the group. The records are distributed across the consumers in a group based on the number of partitions in the topics being consumed.
+
+## Consumer Offsets
+
+Kafka keeps track of the position of a consumer within a partition using a numerical offset. When a consumer reads records from a partition, it can choose to commit its offset to Kafka. This allows the consumer to resume reading from where it left off in case it is restarted.
+
+The  committed offset  is stored in a Kafka internal topic called the "__consumer_offsets" topic. Each record in this topic contains the consumer group, the topic, the partition, and the committed offset for a particular consumer.
+
+## Example
+
+Let's say we have a Kafka topic called "orders" that is partitioned into 3 partitions. We have a consumer group consisting of 2 consumers that are reading records from the "orders" topic.
+
+Each consumer in the group reads records independently from the other consumer. For example, consumer 1 may read records from  partition 1, while consumer 2 may read records from partition 2. This allows for parallel processing of records.
+
+When a consumer reads a record, it also receives the record's offset within the partition. For example, consumer 1 may read a record from partition 1 with an offset of 100. If consumer 1 commits its offset to Kafka, the committed offset for consumer 1 in the "__consumer_offsets" topic will be updated to 100.
+
+If consumer 1 is restarted, it can resume reading from offset 101 in partition 1. This allows for fault tolerance and ensures that each consumer in the group is reading from a unique position within the partition.
+
+## Rebalancing
+
+Consumer groups also support automatic rebalancing. If a new consumer is added to a group or an existing consumer is removed, Kafka will automatically rebalance the partitions across the consumers in the group.
+
+For example, let's say we have a consumer group consisting of 3 consumers that are reading records from the "orders" topic. Each consumer is assigned a partition to read from, and the partitions are distributed evenly across the consumers.
+
+If a new consumer is added to the group, Kafka will automatically rebalance the partitions across the 4 consumers in the group. Each consumer will be assigned a new set of partitions to read from, and the partitions will be distributed evenly across the consumers.
+
+## Offset Management
+
+Kafka provides several APIs for managing consumer offsets. Consumers can commit their offsets manually, or they can use  automatic offset management, which periodically commits offsets based on a specified time interval or number of records.
+
+Kafka also provides the ability to store offsets externally, such as in a database, which provides more flexibility and control over  offset management.
+
+In summary, consumer groups allow for parallel processing of records and provide fault tolerance. Kafka keeps track of the position of a consumer within a partition using a  numerical offset, which allows consumers to resume reading from where they left off in case they are restarted. Kafka also supports  automatic rebalancing  of partitions across consumers in a group and provides several  APIs  for managing consumer offsets.
