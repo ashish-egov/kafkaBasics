@@ -61,3 +61,47 @@ To achieve this, the producer can specify the  product id  as the message key wh
 If the producer wants to ensure that records for the same product are written to the partition in the order they were produced, it can use the product id as the message key and ensure that the records are produced in the order they should be written to Kafka. This allows for easy retrieval and processing of records in the order they were produced.
 
 In summary, producers can use message keys to ensure that records are written to specific partitions based on the key, which allows for easy retrieval and processing of records with the same key. Message keys can also be used to ensure that records are written to the partition in the order they were produced, which allows for easy retrieval and processing of records in the order they were produced.
+
+# Consumers and Deserialization
+
+In  Kafka, a  **consumer**  is a client that subscribes to one or more Kafka topics and reads records from them. When a consumer reads a record from Kafka, it receives a key-value pair that contains a payload of data. The payload can be in any format, such as  JSON,  Avro, or binary.
+
+## Deserialization
+
+Before a consumer can process a record's payload, it must first deserialize it into a usable form. Deserialization is the process of converting the binary data in a record's payload into a  structured format  that can be understood by the consumer.
+
+Kafka supports multiple  serialization formats, including JSON, Avro, and binary. The choice of  serialization format  depends on the use case and the data being stored in Kafka.
+
+## Example
+
+Let's say we have a Kafka topic called "orders". We have a  producer writing records  to the topic, and each record contains an  order id, a  customer id, and a list of items in the order. The payload is in JSON format.
+
+To read records from the "orders" topic, we create a consumer that subscribes to the topic. When the consumer reads a record from Kafka, it receives a key-value pair that contains the order id as the key and the payload as the value.
+
+Before the consumer can process the payload, it must first deserialize it from JSON format into a usable form. To do this, the consumer can use a  JSON deserializer  that converts the JSON data into a structured format, such as a  Java object  or a Map.
+
+For example, the  Java code  below shows how a consumer can deserialize a record's payload from  JSON format  into a  Java  object:
+
+```
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+public class OrderDeserializer implements Deserializer<Order> {
+    private final ObjectMapper objectMapper = new ObjectMapper();
+
+    @Override
+    public Order deserialize(String topic, byte[] data) {
+        try {
+            return objectMapper.readValue(data, Order.class);
+        } catch (IOException e) {
+            throw new RuntimeException("Error deserializing order", e);
+        }
+    }
+}
+
+```
+
+In this example, we use the  Jackson JSON library  to deserialize the record's payload into a Java object of type  `Order`. The  `deserialize`  method takes the topic name and the binary data of the record's value as arguments, and returns a deserialized  `Order`  object.
+
+Once the consumer has deserialized the record's payload, it can process the data in any way it chooses. For example, it could write the data to a database, perform some analysis on the data, or send the data to another system for further processing.
+
+In summary, consumers read records from Kafka topics and receive key-value pairs that contain payloads in various serialization formats. Before processing the payload, the consumer must first deserialize it into a usable form. Kafka supports multiple serialization formats, and the choice of serialization format depends on the use case and the data being stored in Kafka.
