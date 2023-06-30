@@ -180,4 +180,35 @@ The replication factor for a topic determines how many replicas are created for 
 
 The recommended replication factor for a Kafka cluster is at least 3, which ensures that there are multiple copies of the data in case one or more brokers fail.
 
+# Producer Acknowledgements & Topic Durability in  Apache Kafka
+
+Apache Kafka is a  distributed streaming platform  that allows for the processing of high volume, real-time data streams. In Kafka, a producer is responsible for sending messages to a topic, which can be consumed by one or more consumers. In order to ensure that messages are successfully delivered and processed, Kafka provides both  producer acknowledgements  and topic durability.
+
+## Producer Acknowledgements
+
+Producer acknowledgements are a mechanism in Kafka that allow producers to receive confirmation that their messages have been successfully delivered to the broker. When a producer sends a message to a Kafka broker, it can request one of three levels of acknowledgement:
+
+-   `acks=0`: The producer does not wait for any acknowledgement from the broker before sending the next message. This mode provides the highest possible throughput, but also the lowest durability, as there is no guarantee that the broker has received the message.
+    
+-   `acks=1`: The producer waits for acknowledgement from the leader broker that the message has been received. This mode provides a balance between throughput and durability, as the producer can continue sending messages as soon as it receives acknowledgement from the leader broker.
+    
+-   `acks=all`: The producer waits for acknowledgement from all in-sync replicas that the message has been received. This mode provides the highest durability, as the producer can be sure that all replicas have received the message before sending the next message. However, it also has the lowest throughput, as the producer must wait for all replicas to acknowledge receipt of the message before continuing.
+    
+
+In general,  `acks=all`  is the recommended setting for most use cases, as it provides the highest level of durability. However, in cases where high throughput is more important than durability,  `acks=1`  or  `acks=0`  may be appropriate.
+
+## Topic Durability
+
+Topic durability is another mechanism in Kafka that ensures that messages are not lost in the event of a broker failure. In Kafka, a topic can be configured with a  `replication factor`, which specifies the number of replicas that should be maintained for each partition of the topic. When a producer sends a message to a topic, it is written to the  partition leader, which then replicates the message to the other replicas.
+
+If a broker fails, the replicas that were hosted on that broker can be automatically reassigned to other brokers in the cluster. The new replicas will then synchronize with the leader to ensure that they have all of the messages that were written to the partition. This ensures that messages are not lost in the event of a  broker failure.
+
+## Example
+
+Suppose we have a  Kafka cluster  with three brokers (`broker-1`,  `broker-2`, and  `broker-3`), and we create a topic  `my-topic`  with a  replication factor  of 3. When a producer sends a message to  `my-topic`, it is written to the partition leader (let's say it's  `broker-1`) and replicated to the other replicas (`broker-2`  and  `broker-3`).
+
+If  `broker-1`  were to fail, the replicas hosted on that broker would be reassigned to other brokers in the cluster. Let's say that the replicas are reassigned to  `broker-2`  and  `broker-3`. The new replicas will then synchronize with the leader (`broker-2`) to ensure that they have all of the messages that were written to the partition. Once synchronization is complete, the new replicas can continue serving consumer requests.
+
+In this way, Kafka ensures that messages are not lost in the event of a broker failure, and that the system remains highly available and durable.
+
 In summary, brokers are servers that store and manage Kafka topics. Topics are split into one or more partitions, which are stored across multiple brokers. Topic replication is a mechanism for providing fault tolerance and high availability by replicating partitions across multiple brokers. The replication factor for a topic determines how many replicas are created for each partition.
