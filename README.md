@@ -212,3 +212,42 @@ If  `broker-1`  were to fail, the replicas hosted on that broker would be reassi
 In this way, Kafka ensures that messages are not lost in the event of a broker failure, and that the system remains highly available and durable.
 
 In summary, brokers are servers that store and manage Kafka topics. Topics are split into one or more partitions, which are stored across multiple brokers. Topic replication is a mechanism for providing fault tolerance and high availability by replicating partitions across multiple brokers. The replication factor for a topic determines how many replicas are created for each partition.
+
+# Notes on Zookeeper and Kafka KRaft
+
+## Zookeeper
+
+Zookeeper is an open-source  distributed coordination service  that is used by many distributed systems to maintain and manage  configuration information, naming, synchronization, and group services. Zookeeper provides a simple and reliable mechanism for applications to coordinate with each other in distributed environments.
+
+### Features of Zookeeper
+
+-   **Reliable Data Store:**  Zookeeper stores  data reliably by replicating it across multiple servers in a cluster. This ensures that the data is always available even if some servers fail.
+    
+-   **Synchronization:**  Zookeeper provides  synchronization primitives  such as locks, barriers, and semaphores that allow distributed processes to coordinate with each other.
+    
+-   **Naming and Configuration:**  Zookeeper provides a hierarchical naming space that can be used to store configuration information and other metadata.
+    
+-   **Watch Mechanism:**  Zookeeper provides a  watch mechanism  that allows clients to receive notifications when the data they are interested in changes.
+    
+
+### Example Use Cases of Zookeeper
+
+-   Apache  Hadoop uses Zookeeper for distributed coordination of its  NameNode  and  DataNode  processes.
+-   Apache Kafka uses Zookeeper to maintain metadata about the Kafka cluster, such as the location of topics and partitions.
+
+## Kafka KRaft - Removing Zookeeper
+
+Kafka KRaft is a new feature that was introduced in  Apache Kafka  2.8.0. It replaces Zookeeper as the coordination mechanism for Kafka clusters.  Kafka KRaft  uses the  Raft consensus algorithm  to replicate metadata across the Kafka brokers in a cluster.
+
+### Advantages of Kafka KRaft over Zookeeper
+
+-   **Simpler Architecture:**  With Kafka KRaft, there is no need to run a separate Zookeeper cluster. This simplifies the overall architecture of the  Kafka cluster.
+    
+-   **Improved Stability:**  With Zookeeper, it is common for the Zookeeper ensemble to become unstable if too many nodes fail or if there is a network partition. Kafka KRaft is designed to be more stable under these conditions.
+    
+-   **Improved Security:**  With Zookeeper, the metadata of the Kafka cluster is stored in plaintext. Kafka KRaft encrypts the metadata and provides better security for the cluster.
+    
+
+### Example Use Cases of Kafka KRaft
+
+-   Apache Kafka uses Kafka KRaft as the  coordination mechanism  for its clusters starting from version 2.8.0.
